@@ -10,5 +10,8 @@ export_presets.cfg
 data_*/
 *.translation
 
+# Rider ignores
+.idea
+
 :# General
 .DS_Store
