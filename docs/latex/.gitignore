@@ -1,0 +1,29 @@
+# LaTeX build files
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
+*.toc
+*.lof
+*.lot
+*.nav
+*.snm
+*.vrb
+*.bcf
+*.run.xml
+*.idx
+*.ilg
+*.ind
+
+# Minted cache
+_minted-*/
+
+# Build directory (if used)
+build/
+
+# OS files
+.DS_Store
