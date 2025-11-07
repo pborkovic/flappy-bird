@@ -1,0 +1,30 @@
+% ============================================
+% Custom Commands and Definitions
+% ============================================
+
+% Theorem Environments
+\newtheorem{definition}{Definition}[chapter]
+\newtheorem{theorem}{Theorem}[chapter]
+\newtheorem{lemma}{Lemma}[chapter]
+\newtheorem{corollary}{Corollary}[chapter]
+
+% Custom Commands for Common Terms
+\newcommand{\game}{\textit{Flappy Bird}}
+\newcommand{\godot}{\textit{Godot}}
+\newcommand{\csharp}{\textit{C\#}}
+
+% Code snippet command
+\newcommand{\code}[1]{\texttt{#1}}
+
+% Figure path command
+\graphicspath{{../media/assets/}{images/}}
+
+% Custom note environment
+\newenvironment{note}
+    {\par\noindent\textbf{Note:} \small}
+    {\par}
+
+% Custom warning environment
+\newenvironment{warning}
+    {\par\noindent\textcolor{red}{\textbf{Warning:}} \small}
+    {\par}
