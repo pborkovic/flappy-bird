@@ -13,5 +13,7 @@ data_*/
 # Rider ignores
 .idea
 
-:# General
+# General
 .DS_Store
+
+Flappy_Bird.sln.DotSettings.user 
