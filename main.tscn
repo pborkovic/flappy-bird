@@ -1,3 +1,9 @@
-[gd_scene format=3 uid="uid://bhjufbmjrttwt"]
+[gd_scene load_steps=2 format=3 uid="uid://bhjufbmjrttwt"]
+
+[ext_resource type="Texture2D" uid="uid://c850cgxc4jvt4" path="res://assets/backgroundGezogen.jpg" id="1_ig7tw"]
 
 [node name="Main" type="Node"]
+
+[node name="BackgroundFake" type="Sprite2D" parent="."]
+texture = ExtResource("1_ig7tw")
+offset = Vector2(960, 540)
