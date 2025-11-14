@@ -1,0 +1,16 @@
+[gd_scene load_steps=3 format=3 uid="uid://celbl0a6lys4x"]
+
+[ext_resource type="Texture2D" uid="uid://b8x620b27xsnr" path="res://assets/borderBG.png" id="1_yh8r4"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_yh8r4"]
+size = Vector2(910, 112)
+
+[node name="Ground" type="Area2D"]
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("1_yh8r4")
+offset = Vector2(455, 456)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(455, 456)
+shape = SubResource("RectangleShape2D_yh8r4")
