@@ -1,5 +1,6 @@
-[gd_scene load_steps=3 format=3 uid="uid://bumdofox3kqfd"]
+[gd_scene load_steps=4 format=3 uid="uid://bumdofox3kqfd"]
 
+[ext_resource type="Script" path="res://Scripts/Entities/Bird.cs" id="1_3a4b5"]
 [ext_resource type="Texture2D" uid="uid://b4u62nl7r7076" path="res://assets/ederFB.png" id="1_pfmj4"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_laleu"]
@@ -7,6 +8,7 @@ radius = 7.0
 height = 18.0
 
 [node name="EderBird" type="CharacterBody2D"]
+script = ExtResource("1_3a4b5")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 rotation = 1.5707964
