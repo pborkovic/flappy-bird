@@ -10,12 +10,14 @@ public partial class UIController : CanvasLayer
 	[Export] public NodePath ScoreLabelPath;
 	[Export] public NodePath GameOverContainerPath;
 	[Export] public NodePath FinalScoreLabelPath;
+	[Export] public NodePath HighScoreLabelPath;
 	[Export] public NodePath RestartButtonPath;
 	private GameManager _gameManager;
 	private Button _startButton;
 	private Label _scoreLabel;
 	private Control _gameOverContainer;
 	private Label _finalScoreLabel;
+	private Label _highScoreLabel;
 	private Button _restartButton;
 
 	public override void _Ready()
@@ -40,6 +42,11 @@ public partial class UIController : CanvasLayer
 		if (FinalScoreLabelPath != null && !FinalScoreLabelPath.IsEmpty)
 		{
 			_finalScoreLabel = GetNode<Label>(FinalScoreLabelPath);
+		}
+
+		if (HighScoreLabelPath != null && !HighScoreLabelPath.IsEmpty)
+		{
+			_highScoreLabel = GetNode<Label>(HighScoreLabelPath);
 		}
 
 		if (RestartButtonPath != null && !RestartButtonPath.IsEmpty)
@@ -156,6 +163,12 @@ public partial class UIController : CanvasLayer
 		if (_finalScoreLabel != null)
 		{
 			_finalScoreLabel.Text = $"Score: {finalScore}";
+		}
+
+		if (_highScoreLabel != null && _gameManager != null)
+		{
+			var stats = _gameManager.GetDatabaseService().GetStatistics();
+			_highScoreLabel.Text = $"High Score: {stats.HighScore}";
 		}
 	}
 }
