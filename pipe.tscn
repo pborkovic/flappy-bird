@@ -4,40 +4,43 @@
 [ext_resource type="Texture2D" uid="uid://n48u1tu680vh" path="res://assets/tubeFB.png" id="1_bepn3"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_78010"]
-size = Vector2(52, 25)
+size = Vector2(208, 100)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_arayy"]
-size = Vector2(46, 295)
+size = Vector2(184, 1180)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1uqvy"]
-size = Vector2(52, 25)
+size = Vector2(208, 100)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_i3wvs"]
-size = Vector2(46, 295)
+size = Vector2(184, 1180)
 
 [node name="Pipe" type="Area2D"]
 script = ExtResource("1_a2b3c")
 
 [node name="Upper" type="Sprite2D" parent="."]
+position = Vector2(0, -690)
+scale = Vector2(4, 4)
 texture = ExtResource("1_bepn3")
-offset = Vector2(0, -380)
 flip_v = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(0, -232.5)
+position = Vector2(0, -140)
 shape = SubResource("RectangleShape2D_78010")
 
 [node name="CollisionShape2D2" type="CollisionShape2D" parent="."]
-position = Vector2(0, -392.5)
+position = Vector2(0, -730)
 shape = SubResource("RectangleShape2D_arayy")
 
 [node name="Lower" type="Sprite2D" parent="."]
+position = Vector2(0, 490)
+scale = Vector2(4, 4)
 texture = ExtResource("1_bepn3")
 
 [node name="CollisionShape2D3" type="CollisionShape2D" parent="."]
-position = Vector2(0, -147.5)
+position = Vector2(0, -40)
 shape = SubResource("RectangleShape2D_1uqvy")
 
 [node name="CollisionShape2D4" type="CollisionShape2D" parent="."]
-position = Vector2(0, 12.5)
+position = Vector2(0, 530)
 shape = SubResource("RectangleShape2D_i3wvs")
