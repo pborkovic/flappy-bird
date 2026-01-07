@@ -4,7 +4,7 @@ namespace Flappy_Bird.Scripts.Entities;
 
 public partial class Pipe : Area2D
 {
-	private const float ScrollSpeed = 150.0f;
+	public static float ScrollSpeed = 150.0f;
 	private const float DestroyPositionX = -200.0f;
 	private bool _hasBeenPassed = false;
 
