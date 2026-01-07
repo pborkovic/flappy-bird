@@ -8,6 +8,7 @@ radius = 7.0
 height = 18.0
 
 [node name="EderBird" type="CharacterBody2D"]
+scale = Vector2(4, 4)
 script = ExtResource("1_3a4b5")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
