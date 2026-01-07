@@ -1,9 +1,36 @@
-[gd_scene load_steps=2 format=3 uid="uid://bhjufbmjrttwt"]
+[gd_scene load_steps=7 format=3 uid="uid://bhjufbmjrttwt"]
 
 [ext_resource type="Texture2D" uid="uid://c850cgxc4jvt4" path="res://assets/backgroundGezogen.jpg" id="1_ig7tw"]
+[ext_resource type="Script" path="res://Scripts/Managers/GameManager.cs" id="2_gm"]
+[ext_resource type="Script" path="res://Scripts/Managers/SpawnManager.cs" id="3_sm"]
+[ext_resource type="PackedScene" uid="uid://bumdofox3kqfd" path="res://eder_bird.tscn" id="4_bird"]
+[ext_resource type="PackedScene" uid="uid://djh8k3m9v4q2p" path="res://ground.tscn" id="5_ground"]
+[ext_resource type="PackedScene" uid="uid://bv2k8m3p9x4q1" path="res://ui.tscn" id="6_ui"]
 
 [node name="Main" type="Node"]
 
 [node name="BackgroundFake" type="Sprite2D" parent="."]
 texture = ExtResource("1_ig7tw")
 offset = Vector2(960, 540)
+
+[node name="GameManager" type="Node" parent="."]
+script = ExtResource("2_gm")
+BirdPath = NodePath("../EderBird")
+SpawnManagerPath = NodePath("../SpawnManager")
+
+[node name="SpawnManager" type="Node" parent="."]
+script = ExtResource("3_sm")
+
+[node name="EderBird" parent="." instance=ExtResource("4_bird")]
+position = Vector2(200, 540)
+
+[node name="Ground" parent="." instance=ExtResource("5_ground")]
+position = Vector2(0, 1030)
+
+[node name="UI" parent="." instance=ExtResource("6_ui")]
+GameManagerPath = NodePath("../GameManager")
+StartButtonPath = NodePath("StartButton")
+ScoreLabelPath = NodePath("ScoreLabel")
+GameOverContainerPath = NodePath("GameOverContainer")
+FinalScoreLabelPath = NodePath("GameOverContainer/FinalScoreLabel")
+RestartButtonPath = NodePath("GameOverContainer/RestartButton")
