@@ -5,10 +5,10 @@ namespace Flappy_Bird.Scripts.Managers;
 
 public partial class SpawnManager : Node
 {
-	private const float SpawnInterval = 2.0f;
+	private const float SpawnInterval = 3.0f;
 	private const float SpawnPositionX = 2000.0f;
-	private const float MinGapY = 200.0f;
-	private const float MaxGapY = 880.0f;
+	private const float MinGapY = 400.0f;
+	private const float MaxGapY = 650.0f;
 	private PackedScene _pipeScene;
 	private Timer _spawnTimer;
 	private bool _isSpawning = false;
