@@ -2,6 +2,7 @@ using System;
 using Godot;
 using Flappy_Bird.Scripts.Entities;
 using Flappy_Bird.Scripts.Services;
+using Flappy_Bird.Scripts.Systems;
 using Flappy_Bird.Scripts.Utils.Enums;
 
 namespace Flappy_Bird.Scripts.Managers;
@@ -15,6 +16,7 @@ public partial class GameManager : Node
 	private Bird _bird;
 	private SpawnManager _spawnManager;
 	private DatabaseService _databaseService;
+	private DifficultyScaler _difficultyScaler;
 	private GameState _currentState = GameState.Menu;
 	private int _score = 0;
 	private DateTime _sessionStartTime;
@@ -33,6 +35,7 @@ public partial class GameManager : Node
 		_bird = GetNode<Bird>(BirdPath);
 		_spawnManager = GetNode<SpawnManager>(SpawnManagerPath);
 		_databaseService = new DatabaseService();
+		_difficultyScaler = new DifficultyScaler();
 
 		if (_bird != null)
 		{
@@ -64,6 +67,9 @@ public partial class GameManager : Node
 		_score = 0;
 		_sessionStartTime = DateTime.Now;
 
+		_difficultyScaler.Reset();
+		Pipe.ScrollSpeed = _difficultyScaler.GetScrollSpeed();
+
 		if (_bird != null)
 		{
 			_bird.Reset();
@@ -73,6 +79,7 @@ public partial class GameManager : Node
 		if (_spawnManager != null)
 		{
 			_spawnManager.ClearAllPipes();
+			_spawnManager.SetSpawnInterval(_difficultyScaler.GetSpawnInterval());
 			_spawnManager.StartSpawning();
 		}
 
@@ -160,6 +167,15 @@ public partial class GameManager : Node
 			return;
 
 		_score++;
+
+		_difficultyScaler.UpdateDifficulty(_score);
+		Pipe.ScrollSpeed = _difficultyScaler.GetScrollSpeed();
+
+		if (_spawnManager != null)
+		{
+			_spawnManager.SetSpawnInterval(_difficultyScaler.GetSpawnInterval());
+		}
+
 		EmitSignal(SignalName.ScoreChanged, _score);
 	}
 
@@ -168,4 +184,6 @@ public partial class GameManager : Node
 	public int GetScore() => _score;
 
 	public DatabaseService GetDatabaseService() => _databaseService;
+
+	public int GetDifficultyLevel() => _difficultyScaler.GetDifficultyLevel();
 }
