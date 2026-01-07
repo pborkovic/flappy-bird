@@ -19,28 +19,28 @@ size = Vector2(184, 1180)
 script = ExtResource("1_a2b3c")
 
 [node name="Upper" type="Sprite2D" parent="."]
-position = Vector2(0, -690)
+position = Vector2(0, -800)
 scale = Vector2(4, 4)
 texture = ExtResource("1_bepn3")
 flip_v = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(0, -140)
+position = Vector2(0, -250)
 shape = SubResource("RectangleShape2D_78010")
 
 [node name="CollisionShape2D2" type="CollisionShape2D" parent="."]
-position = Vector2(0, -730)
+position = Vector2(0, -840)
 shape = SubResource("RectangleShape2D_arayy")
 
 [node name="Lower" type="Sprite2D" parent="."]
-position = Vector2(0, 490)
+position = Vector2(0, 600)
 scale = Vector2(4, 4)
 texture = ExtResource("1_bepn3")
 
 [node name="CollisionShape2D3" type="CollisionShape2D" parent="."]
-position = Vector2(0, -40)
+position = Vector2(0, 50)
 shape = SubResource("RectangleShape2D_1uqvy")
 
 [node name="CollisionShape2D4" type="CollisionShape2D" parent="."]
-position = Vector2(0, 530)
+position = Vector2(0, 640)
 shape = SubResource("RectangleShape2D_i3wvs")
