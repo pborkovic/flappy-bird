@@ -40,8 +40,13 @@ public partial class Bird : CharacterBody2D
 		Rotation = targetRotation;
 
 		Velocity = velocity;
-		
+
 		MoveAndSlide();
+
+		if (IsOnFloor())
+		{
+			Kill();
+		}
 	}
 
 	public void Kill()
