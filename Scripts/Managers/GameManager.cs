@@ -1,5 +1,7 @@
+using System;
 using Godot;
 using Flappy_Bird.Scripts.Entities;
+using Flappy_Bird.Scripts.Services;
 using Flappy_Bird.Scripts.Utils.Enums;
 
 namespace Flappy_Bird.Scripts.Managers;
@@ -12,8 +14,10 @@ public partial class GameManager : Node
 	[Export] public NodePath SpawnManagerPath;
 	private Bird _bird;
 	private SpawnManager _spawnManager;
+	private DatabaseService _databaseService;
 	private GameState _currentState = GameState.Menu;
 	private int _score = 0;
+	private DateTime _sessionStartTime;
 
 	[Signal]
 	public delegate void GameStartedEventHandler();
@@ -28,6 +32,7 @@ public partial class GameManager : Node
 	{
 		_bird = GetNode<Bird>(BirdPath);
 		_spawnManager = GetNode<SpawnManager>(SpawnManagerPath);
+		_databaseService = new DatabaseService();
 
 		if (_bird != null)
 		{
@@ -57,6 +62,7 @@ public partial class GameManager : Node
 
 		_currentState = GameState.Playing;
 		_score = 0;
+		_sessionStartTime = DateTime.Now;
 
 		if (_bird != null)
 		{
@@ -85,6 +91,9 @@ public partial class GameManager : Node
 		{
 			_spawnManager.StopSpawning();
 		}
+
+		var sessionDuration = (DateTime.Now - _sessionStartTime).TotalSeconds;
+		_databaseService.SaveGameSession(_score, _score, sessionDuration);
 
 		EmitSignal(SignalName.GameOver, _score);
 	}
@@ -157,4 +166,6 @@ public partial class GameManager : Node
 	public GameState GetCurrentState() => _currentState;
 
 	public int GetScore() => _score;
+
+	public DatabaseService GetDatabaseService() => _databaseService;
 }
