@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://bhjufbmjrttwt"]
+[gd_scene load_steps=8 format=3 uid="uid://bhjufbmjrttwt"]
 
 [ext_resource type="Texture2D" uid="uid://c0duvojep0ujs" path="res://assets/backgroundSundown.png" id="1_ig7tw"]
 [ext_resource type="Script" path="res://Scripts/Managers/GameManager.cs" id="2_gm"]
@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://bumdofox3kqfd" path="res://eder_bird.tscn" id="4_bird"]
 [ext_resource type="PackedScene" uid="uid://djh8k3m9v4q2p" path="res://ground.tscn" id="5_ground"]
 [ext_resource type="PackedScene" uid="uid://bv2k8m3p9x4q1" path="res://ui.tscn" id="6_ui"]
+[ext_resource type="PackedScene" uid="uid://weather123456" path="res://weather.tscn" id="7_weather"]
 
 [node name="Main" type="Node"]
 
@@ -29,6 +30,8 @@ position = Vector2(200, 540)
 
 [node name="Ground" parent="." instance=ExtResource("5_ground")]
 position = Vector2(0, 1030)
+
+[node name="WeatherSystem" parent="." instance=ExtResource("7_weather")]
 
 [node name="UI" parent="." instance=ExtResource("6_ui")]
 GameManagerPath = NodePath("../GameManager")
