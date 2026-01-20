@@ -1,0 +1,61 @@
+[gd_scene load_steps=6 format=3 uid="uid://c18hi36r83red"]
+
+[ext_resource type="Script" path="res://Scripts/Controllers/WeatherController.cs" id="1_weather"]
+
+[sub_resource type="Gradient" id="Gradient_rain"]
+colors = PackedColorArray(0.7, 0.8, 1, 0.8, 0.7, 0.8, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_rain"]
+gradient = SubResource("Gradient_rain")
+width = 4
+height = 30
+fill_from = Vector2(0.5, 0)
+fill_to = Vector2(0.5, 1)
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_rain"]
+direction = Vector3(0.2, 1, 0)
+spread = 8.0
+initial_velocity_min = 600.0
+initial_velocity_max = 800.0
+gravity = Vector3(50, 400, 0)
+scale_min = 0.8
+scale_max = 1.2
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_rain"]
+blend_mode = 1
+
+[node name="WeatherSystem" type="CanvasLayer"]
+layer = 10
+
+[node name="WeatherController" type="Node" parent="."]
+script = ExtResource("1_weather")
+NightOverlayPath = NodePath("../NightOverlay")
+RainParticlesPath = NodePath("../RainParticles")
+FogOverlayPath = NodePath("../FogOverlay")
+
+[node name="NightOverlay" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 1920.0
+offset_bottom = 1080.0
+mouse_filter = 2
+color = Color(0, 0, 0.15, 0)
+
+[node name="FogOverlay" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 1920.0
+offset_bottom = 1080.0
+mouse_filter = 2
+color = Color(0.85, 0.85, 0.9, 0)
+
+[node name="RainParticles" type="GpuParticles2D" parent="."]
+material = SubResource("CanvasItemMaterial_rain")
+position = Vector2(960, -50)
+emitting = false
+amount = 300
+process_material = SubResource("ParticleProcessMaterial_rain")
+texture = SubResource("GradientTexture2D_rain")
+visibility_rect = Rect2(-1000, -100, 2000, 1300)
