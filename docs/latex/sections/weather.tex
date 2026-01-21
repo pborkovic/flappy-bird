@@ -1,0 +1,140 @@
+% ============================================
+% Weather System
+% ============================================
+
+\chapter{Weather System}
+
+\section{Overview}
+
+Dynamic weather and time-of-day system rendered via \texttt{CanvasLayer} (layer 10).
+
+\section{Enumerations}
+
+\subsection{WeatherType}
+
+\begin{lstlisting}[language={[Sharp]C}]
+public enum WeatherType
+{
+    Clear,  // No weather effects
+    Rain,   // Particle-based rain
+    Fog     // Screen overlay
+}
+\end{lstlisting}
+
+\subsection{TimeOfDay}
+
+\begin{lstlisting}[language={[Sharp]C}]
+public enum TimeOfDay
+{
+    Day,    // No overlay
+    Night   // Dark tint overlay
+}
+\end{lstlisting}
+
+\section{WeatherController}
+
+\subsection{Configuration Constants}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Parameter} & \textbf{Value} & \textbf{Description} \\
+\hline
+WeatherChangeInterval & 30.0s & Auto-change period \\
+TransitionDuration & 2.0s & Effect fade duration \\
+\hline
+\end{tabular}
+\caption{WeatherController configuration}
+\end{table}
+
+\subsection{Visual Effects}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Effect} & \textbf{Implementation} & \textbf{Properties} \\
+\hline
+Night & ColorRect overlay & Color(0, 0, 0.15, 0.6) \\
+Rain & GpuParticles2D & 300 particles, diagonal fall \\
+Fog & ColorRect overlay & Color(0.85, 0.85, 0.9, 0.5) \\
+\hline
+\end{tabular}
+\caption{Weather visual effects}
+\end{table}
+
+\subsection{Public API}
+
+\begin{lstlisting}[language={[Sharp]C}]
+// Set specific weather/time
+void SetWeather(WeatherType weather)
+void SetTimeOfDay(TimeOfDay timeOfDay)
+
+// Randomize both
+void RandomizeWeather()
+
+// Control auto-cycling
+void SetAutoChangeWeather(bool enabled)
+
+// Reset to Clear/Day
+void ResetWeather()
+
+// Getters
+WeatherType GetCurrentWeather()
+TimeOfDay GetCurrentTimeOfDay()
+\end{lstlisting}
+
+\section{Scene Structure}
+
+\begin{lstlisting}
+WeatherSystem (CanvasLayer, layer=10)
++-- WeatherController (Node)
++-- NightOverlay (ColorRect)
+|   +-- mouse_filter = IGNORE
+|   +-- anchors = full screen
++-- FogOverlay (ColorRect)
+|   +-- mouse_filter = IGNORE
+|   +-- anchors = full screen
++-- RainParticles (GpuParticles2D)
+    +-- amount = 300
+    +-- position = (960, -50)
+\end{lstlisting}
+
+\section{Rain Particle Configuration}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Property} & \textbf{Value} \\
+\hline
+Direction & (0.2, 1, 0) \\
+Spread & 8.0\textdegree \\
+Initial velocity & 600-800 \\
+Gravity & (50, 400, 0) \\
+Scale range & 0.8-1.2 \\
+Blend mode & Additive \\
+\hline
+\end{tabular}
+\caption{Rain particle material settings}
+\end{table}
+
+\section{Transition System}
+
+Effects use Godot's \texttt{Tween} for smooth transitions:
+
+\begin{lstlisting}[language={[Sharp]C}]
+_currentTween?.Kill();
+_currentTween = CreateTween();
+_currentTween.TweenProperty(
+    _nightOverlay,
+    "color:a",
+    0.6f,
+    TransitionDuration
+);
+\end{lstlisting}
+
+\section{Input Handling}
+
+All overlay \texttt{ColorRect} nodes have \texttt{mouse\_filter = 2} (IGNORE) to prevent blocking UI interactions.
