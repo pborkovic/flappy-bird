@@ -1,5 +1,6 @@
 using Godot;
 using Flappy_Bird.Scripts.Managers;
+using Flappy_Bird.Scripts.Models;
 
 namespace Flappy_Bird.Scripts.Controllers;
 
@@ -167,7 +168,7 @@ public partial class UIController : CanvasLayer
 
 		if (_highScoreLabel != null && _gameManager != null)
 		{
-			var stats = _gameManager.GetDatabaseService().GetStatistics();
+			GameStatistics stats = _gameManager.GetDatabaseService().GetStatistics();
 			_highScoreLabel.Text = $"High Score: {stats.HighScore}";
 		}
 	}
