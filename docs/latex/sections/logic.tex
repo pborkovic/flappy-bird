@@ -1,0 +1,132 @@
+% ============================================
+% Game Logic
+% ============================================
+
+\chapter{Game Logic}
+
+\section{GameManager}
+
+Central controller for game state, scoring, and system coordination.
+
+\subsection{Game States}
+
+\begin{lstlisting}[language={[Sharp]C}]
+public enum GameState
+{
+    Menu,
+    Playing,
+    GameOver
+}
+\end{lstlisting}
+
+\subsection{State Transitions}
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[node distance=3cm, auto]
+    \node[draw, rounded corners] (menu) {Menu};
+    \node[draw, rounded corners, right of=menu] (playing) {Playing};
+    \node[draw, rounded corners, right of=playing] (gameover) {GameOver};
+
+    \draw[->] (menu) -- node[above] {StartGame()} (playing);
+    \draw[->] (playing) -- node[above] {EndGame()} (gameover);
+    \draw[->] (gameover) to[bend right=30] node[below] {RestartGame()} (playing);
+    \draw[->] (gameover) to[bend left=50] node[above] {ReturnToMenu()} (menu);
+\end{tikzpicture}
+\caption{Game state machine}
+\end{figure}
+
+\subsection{Signals}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Signal} & \textbf{Payload} \\
+\hline
+\texttt{GameStarted} & None \\
+\texttt{GameOver} & \texttt{int finalScore} \\
+\texttt{ScoreChanged} & \texttt{int newScore} \\
+\hline
+\end{tabular}
+\caption{GameManager signals}
+\end{table}
+
+\subsection{Core Methods}
+
+\begin{itemize}
+    \item \texttt{StartGame()}: Initializes game state, resets bird/difficulty, starts spawning
+    \item \texttt{EndGame()}: Stops spawning, saves session to database, emits GameOver
+    \item \texttt{RestartGame()}: Calls EndGame() then deferred StartGame()
+    \item \texttt{OnPipePassed()}: Increments score, updates difficulty
+\end{itemize}
+
+\section{SpawnManager}
+
+Handles pipe instantiation with configurable intervals.
+
+\subsection{Configuration}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Parameter} & \textbf{Value} & \textbf{Description} \\
+\hline
+SpawnInterval & 3.0s & Default time between spawns \\
+SpawnPositionX & 2000 & Spawn X coordinate (off-screen right) \\
+MinGapY & 400 & Minimum gap Y position \\
+MaxGapY & 650 & Maximum gap Y position \\
+\hline
+\end{tabular}
+\caption{SpawnManager configuration}
+\end{table}
+
+\subsection{Pipe Grouping}
+
+All spawned pipes are added to the \texttt{"pipes"} group for batch operations:
+
+\begin{lstlisting}[language={[Sharp]C}]
+pipe.AddToGroup("pipes");
+\end{lstlisting}
+
+\section{DifficultyScaler}
+
+Dynamic difficulty adjustment based on player score.
+
+\subsection{Scaling Parameters}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|l|l|}
+\hline
+\textbf{Parameter} & \textbf{Base} & \textbf{Limit} & \textbf{Rate} \\
+\hline
+ScrollSpeed & 150 & 400 (max) & +3/point \\
+SpawnInterval & 3.0s & 1.5s (min) & -0.02s/point \\
+\hline
+\end{tabular}
+\caption{Difficulty scaling parameters}
+\end{table}
+
+\subsection{Difficulty Level Calculation}
+
+\begin{lstlisting}[language={[Sharp]C}]
+public int GetDifficultyLevel()
+{
+    var speedProgress = (_currentScrollSpeed - BaseScrollSpeed)
+                      / (MaxScrollSpeed - BaseScrollSpeed);
+    return Mathf.Clamp((int)(speedProgress * 10) + 1, 1, 10);
+}
+\end{lstlisting}
+
+Returns level 1-10 based on current scroll speed progression.
+
+\subsection{Integration Flow}
+
+\begin{enumerate}
+    \item Player passes pipe $\rightarrow$ \texttt{OnPipePassed()}
+    \item \texttt{\_difficultyScaler.UpdateDifficulty(\_score)}
+    \item \texttt{Pipe.ScrollSpeed = \_difficultyScaler.GetScrollSpeed()}
+    \item \texttt{\_spawnManager.SetSpawnInterval(...)}
+\end{enumerate}
