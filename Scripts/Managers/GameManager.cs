@@ -99,7 +99,7 @@ public partial class GameManager : Node
 			_spawnManager.StopSpawning();
 		}
 
-		var sessionDuration = (DateTime.Now - _sessionStartTime).TotalSeconds;
+		double sessionDuration = (DateTime.Now - _sessionStartTime).TotalSeconds;
 		_databaseService.SaveGameSession(_score, _score, sessionDuration);
 
 		EmitSignal(SignalName.GameOver, _score);
