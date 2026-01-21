@@ -85,14 +85,14 @@ public partial class WeatherController : Node
 
     public void RandomizeWeather()
     {
-        var random = new RandomNumberGenerator();
+        RandomNumberGenerator random = new RandomNumberGenerator();
         random.Randomize();
 
-        var weatherValues = System.Enum.GetValues<WeatherType>();
-        var timeValues = System.Enum.GetValues<TimeOfDay>();
+        WeatherType[] weatherValues = System.Enum.GetValues<WeatherType>();
+        TimeOfDay[] timeValues = System.Enum.GetValues<TimeOfDay>();
 
-        var newWeather = weatherValues[random.RandiRange(0, weatherValues.Length - 1)];
-        var newTime = timeValues[random.RandiRange(0, timeValues.Length - 1)];
+        WeatherType newWeather = weatherValues[random.RandiRange(0, weatherValues.Length - 1)];
+        TimeOfDay newTime = timeValues[random.RandiRange(0, timeValues.Length - 1)];
 
         SetWeather(newWeather);
         SetTimeOfDay(newTime);
