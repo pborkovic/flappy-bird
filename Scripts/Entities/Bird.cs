@@ -21,7 +21,7 @@ public partial class Bird : CharacterBody2D
 		if (!_isAlive)
 			return;
 
-		var velocity = Velocity;
+		Vector2 velocity = Velocity;
 
 		if (Input.IsActionJustPressed("ui_accept") ||
 		    Input.IsKeyPressed(Key.Space) ||
@@ -35,7 +35,7 @@ public partial class Bird : CharacterBody2D
 			velocity.Y += Gravity * (float)delta;
 		}
 
-		var targetRotation = velocity.Y * RotationSpeed;
+		float targetRotation = velocity.Y * RotationSpeed;
 		targetRotation = Mathf.Clamp(targetRotation, MaxRotationUp, MaxRotationDown);
 		Rotation = targetRotation;
 
