@@ -1,0 +1,111 @@
+% ============================================
+% User Interface
+% ============================================
+
+\chapter{User Interface}
+
+\section{Screen States}
+
+The UI manages three distinct visual states controlled by \texttt{UIController}.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Element} & \textbf{Menu} & \textbf{Playing} & \textbf{GameOver} \\
+\hline
+StartButton & Visible & Hidden & Hidden \\
+ScoreLabel & Hidden & Visible & Hidden \\
+GameOverContainer & Hidden & Hidden & Visible \\
+\hline
+\end{tabular}
+\caption{UI element visibility per state}
+\end{table}
+
+\section{UI Hierarchy}
+
+\begin{lstlisting}
+UI (CanvasLayer)
++-- StartButton (Button)
++-- ScoreLabel (Label)
++-- GameOverContainer (Control)
+    +-- Panel (ColorRect)
+    +-- GameOverLabel (Label)
+    +-- FinalScoreLabel (Label)
+    +-- HighScoreLabel (Label)
+    +-- RestartButton (Button)
+\end{lstlisting}
+
+\section{UIController}
+
+\subsection{Exported Node Paths}
+
+\begin{lstlisting}[language={[Sharp]C}]
+[Export] public NodePath GameManagerPath;
+[Export] public NodePath StartButtonPath;
+[Export] public NodePath ScoreLabelPath;
+[Export] public NodePath GameOverContainerPath;
+[Export] public NodePath FinalScoreLabelPath;
+[Export] public NodePath HighScoreLabelPath;
+[Export] public NodePath RestartButtonPath;
+\end{lstlisting}
+
+\subsection{Signal Connections}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Source} & \textbf{Signal} & \textbf{Handler} \\
+\hline
+StartButton & Pressed & \texttt{OnStartButtonPressed()} \\
+RestartButton & Pressed & \texttt{OnRestartButtonPressed()} \\
+GameManager & GameStarted & \texttt{OnGameStarted()} \\
+GameManager & GameOver & \texttt{OnGameOver(finalScore)} \\
+GameManager & ScoreChanged & \texttt{OnScoreChanged(newScore)} \\
+\hline
+\end{tabular}
+\caption{UIController signal connections}
+\end{table}
+
+\section{Menu Screen}
+
+\begin{itemize}
+    \item Displays START GAME button centered at (810, 490)
+    \item Button dimensions: 300 $\times$ 100
+    \item Background: \texttt{backgroundSundown.png} (full screen)
+\end{itemize}
+
+\section{Gameplay Screen}
+
+\begin{itemize}
+    \item Score label at top center (910, 50)
+    \item Font size: 48pt
+    \item Real-time score updates via \texttt{ScoreChanged} signal
+\end{itemize}
+
+\section{Game Over Screen}
+
+\begin{itemize}
+    \item Semi-transparent panel (660, 340) to (1260, 740)
+    \item Panel color: RGBA(0.2, 0.2, 0.2, 0.9)
+    \item Displays:
+    \begin{itemize}
+        \item "GAME OVER" header (48pt)
+        \item Final score (32pt)
+        \item High score from database (28pt)
+        \item RESTART button
+    \end{itemize}
+\end{itemize}
+
+\section{Scene Integration}
+
+The UI is instanced in \texttt{main.tscn} with exported paths configured:
+
+\begin{lstlisting}
+[node name="UI" parent="." instance=ExtResource("6_ui")]
+GameManagerPath = NodePath("../GameManager")
+StartButtonPath = NodePath("StartButton")
+ScoreLabelPath = NodePath("ScoreLabel")
+...
+\end{lstlisting}
