@@ -13,17 +13,17 @@ public class DatabaseService
 
 	public DatabaseService()
 	{
-		var dbPath = System.IO.Path.Combine(OS.GetUserDataDir(), DatabaseFileName);
+		string dbPath = System.IO.Path.Combine(OS.GetUserDataDir(), DatabaseFileName);
 		_connectionString = $"Data Source={dbPath}";
 		InitializeDatabase();
 	}
 
 	private void InitializeDatabase()
 	{
-		using var connection = new SqliteConnection(_connectionString);
+		using SqliteConnection connection = new SqliteConnection(_connectionString);
 		connection.Open();
 
-		var createStatisticsTable = @"
+		string createStatisticsTable = @"
 			CREATE TABLE IF NOT EXISTS GameStatistics (
 				Id INTEGER PRIMARY KEY AUTOINCREMENT,
 				HighScore INTEGER NOT NULL DEFAULT 0,
@@ -34,7 +34,7 @@ public class DatabaseService
 				AverageScore INTEGER NOT NULL DEFAULT 0
 			)";
 
-		var createSessionsTable = @"
+		string createSessionsTable = @"
 			CREATE TABLE IF NOT EXISTS GameSessions (
 				Id INTEGER PRIMARY KEY AUTOINCREMENT,
 				Score INTEGER NOT NULL,
@@ -43,12 +43,12 @@ public class DatabaseService
 				SessionDuration REAL NOT NULL
 			)";
 
-		using (var command = new SqliteCommand(createStatisticsTable, connection))
+		using (SqliteCommand command = new SqliteCommand(createStatisticsTable, connection))
 		{
 			command.ExecuteNonQuery();
 		}
 
-		using (var command = new SqliteCommand(createSessionsTable, connection))
+		using (SqliteCommand command = new SqliteCommand(createSessionsTable, connection))
 		{
 			command.ExecuteNonQuery();
 		}
@@ -58,17 +58,17 @@ public class DatabaseService
 
 	private void EnsureStatisticsRecordExists(SqliteConnection connection)
 	{
-		var checkQuery = "SELECT COUNT(*) FROM GameStatistics";
-		using var checkCommand = new SqliteCommand(checkQuery, connection);
-		var count = Convert.ToInt32(checkCommand.ExecuteScalar());
+		string checkQuery = "SELECT COUNT(*) FROM GameStatistics";
+		using SqliteCommand checkCommand = new SqliteCommand(checkQuery, connection);
+		int count = Convert.ToInt32(checkCommand.ExecuteScalar());
 
 		if (count == 0)
 		{
-			var insertQuery = @"
+			string insertQuery = @"
 				INSERT INTO GameStatistics (HighScore, TotalGamesPlayed, TotalDeaths, TotalPipesPassed, LastPlayedDate, AverageScore)
 				VALUES (0, 0, 0, 0, @date, 0)";
 
-			using var insertCommand = new SqliteCommand(insertQuery, connection);
+			using SqliteCommand insertCommand = new SqliteCommand(insertQuery, connection);
 			insertCommand.Parameters.AddWithValue("@date", DateTime.Now.ToString("o"));
 			insertCommand.ExecuteNonQuery();
 		}
@@ -76,18 +76,18 @@ public class DatabaseService
 
 	public void SaveGameSession(int score, int pipesPassed, double sessionDuration)
 	{
-		using var connection = new SqliteConnection(_connectionString);
+		using SqliteConnection connection = new SqliteConnection(_connectionString);
 		connection.Open();
 
-		using var transaction = connection.BeginTransaction();
+		using SqliteTransaction transaction = connection.BeginTransaction();
 
 		try
 		{
-			var insertSessionQuery = @"
+			string insertSessionQuery = @"
 				INSERT INTO GameSessions (Score, PipesPassed, PlayedDate, SessionDuration)
 				VALUES (@score, @pipes, @date, @duration)";
 
-			using (var command = new SqliteCommand(insertSessionQuery, connection, transaction))
+			using (SqliteCommand command = new SqliteCommand(insertSessionQuery, connection, transaction))
 			{
 				command.Parameters.AddWithValue("@score", score);
 				command.Parameters.AddWithValue("@pipes", pipesPassed);
@@ -109,17 +109,17 @@ public class DatabaseService
 
 	private void UpdateStatistics(SqliteConnection connection, SqliteTransaction transaction, int score, int pipesPassed)
 	{
-		var stats = GetStatistics();
+		GameStatistics stats = GetStatistics();
 
-		var newHighScore = Math.Max(stats.HighScore, score);
-		var newTotalGames = stats.TotalGamesPlayed + 1;
-		var newTotalDeaths = stats.TotalDeaths + 1;
-		var newTotalPipes = stats.TotalPipesPassed + pipesPassed;
+		int newHighScore = Math.Max(stats.HighScore, score);
+		int newTotalGames = stats.TotalGamesPlayed + 1;
+		int newTotalDeaths = stats.TotalDeaths + 1;
+		int newTotalPipes = stats.TotalPipesPassed + pipesPassed;
 
-		var totalScore = (stats.AverageScore * stats.TotalGamesPlayed) + score;
-		var newAverageScore = totalScore / newTotalGames;
+		int totalScore = (stats.AverageScore * stats.TotalGamesPlayed) + score;
+		int newAverageScore = totalScore / newTotalGames;
 
-		var updateQuery = @"
+		string updateQuery = @"
 			UPDATE GameStatistics SET
 				HighScore = @highScore,
 				TotalGamesPlayed = @totalGames,
@@ -129,7 +129,7 @@ public class DatabaseService
 				AverageScore = @avgScore
 			WHERE Id = 1";
 
-		using var command = new SqliteCommand(updateQuery, connection, transaction);
+		using SqliteCommand command = new SqliteCommand(updateQuery, connection, transaction);
 		command.Parameters.AddWithValue("@highScore", newHighScore);
 		command.Parameters.AddWithValue("@totalGames", newTotalGames);
 		command.Parameters.AddWithValue("@totalDeaths", newTotalDeaths);
@@ -141,13 +141,13 @@ public class DatabaseService
 
 	public GameStatistics GetStatistics()
 	{
-		using var connection = new SqliteConnection(_connectionString);
+		using SqliteConnection connection = new SqliteConnection(_connectionString);
 		connection.Open();
 
-		var query = "SELECT * FROM GameStatistics WHERE Id = 1";
+		string query = "SELECT * FROM GameStatistics WHERE Id = 1";
 
-		using var command = new SqliteCommand(query, connection);
-		using var reader = command.ExecuteReader();
+		using SqliteCommand command = new SqliteCommand(query, connection);
+		using SqliteDataReader reader = command.ExecuteReader();
 
 		if (reader.Read())
 		{
@@ -168,17 +168,17 @@ public class DatabaseService
 
 	public List<GameSession> GetRecentSessions(int limit = 10)
 	{
-		var sessions = new List<GameSession>();
+		List<GameSession> sessions = new List<GameSession>();
 
-		using var connection = new SqliteConnection(_connectionString);
+		using SqliteConnection connection = new SqliteConnection(_connectionString);
 		connection.Open();
 
-		var query = "SELECT * FROM GameSessions ORDER BY PlayedDate DESC LIMIT @limit";
+		string query = "SELECT * FROM GameSessions ORDER BY PlayedDate DESC LIMIT @limit";
 
-		using var command = new SqliteCommand(query, connection);
+		using SqliteCommand command = new SqliteCommand(query, connection);
 		command.Parameters.AddWithValue("@limit", limit);
 
-		using var reader = command.ExecuteReader();
+		using SqliteDataReader reader = command.ExecuteReader();
 
 		while (reader.Read())
 		{
@@ -197,19 +197,19 @@ public class DatabaseService
 
 	public void ResetAllStatistics()
 	{
-		using var connection = new SqliteConnection(_connectionString);
+		using SqliteConnection connection = new SqliteConnection(_connectionString);
 		connection.Open();
 
-		using var transaction = connection.BeginTransaction();
+		using SqliteTransaction transaction = connection.BeginTransaction();
 
 		try
 		{
-			using (var command = new SqliteCommand("DELETE FROM GameSessions", connection, transaction))
+			using (SqliteCommand command = new SqliteCommand("DELETE FROM GameSessions", connection, transaction))
 			{
 				command.ExecuteNonQuery();
 			}
 
-			var resetQuery = @"
+			string resetQuery = @"
 				UPDATE GameStatistics SET
 					HighScore = 0,
 					TotalGamesPlayed = 0,
@@ -219,7 +219,7 @@ public class DatabaseService
 					AverageScore = 0
 				WHERE Id = 1";
 
-			using (var command = new SqliteCommand(resetQuery, connection, transaction))
+			using (SqliteCommand command = new SqliteCommand(resetQuery, connection, transaction))
 			{
 				command.Parameters.AddWithValue("@date", DateTime.Now.ToString("o"));
 				command.ExecuteNonQuery();
