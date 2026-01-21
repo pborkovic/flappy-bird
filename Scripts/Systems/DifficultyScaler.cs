@@ -38,7 +38,7 @@ public class DifficultyScaler
 
 	public int GetDifficultyLevel()
 	{
-		var speedProgress = (_currentScrollSpeed - BaseScrollSpeed) / (MaxScrollSpeed - BaseScrollSpeed);
+		float speedProgress = (_currentScrollSpeed - BaseScrollSpeed) / (MaxScrollSpeed - BaseScrollSpeed);
 		return Mathf.Clamp((int)(speedProgress * 10) + 1, 1, 10);
 	}
 }
