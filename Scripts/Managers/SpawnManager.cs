@@ -39,9 +39,9 @@ public partial class SpawnManager : Node
 
 	public void ClearAllPipes()
 	{
-		var pipes = GetTree().GetNodesInGroup("pipes");
-		
-		foreach (var pipe in pipes)
+		Godot.Collections.Array<Node> pipes = GetTree().GetNodesInGroup("pipes");
+
+		foreach (Node pipe in pipes)
 		{
 			if (pipe is Node node)
 			{
@@ -63,8 +63,8 @@ public partial class SpawnManager : Node
 		if (_pipeScene == null)
 			return;
 
-		var pipe = _pipeScene.Instantiate<Pipe>();
-		var randomGapY = (float)GD.RandRange(MinGapY, MaxGapY);
+		Pipe pipe = _pipeScene.Instantiate<Pipe>();
+		float randomGapY = (float)GD.RandRange(MinGapY, MaxGapY);
 		
 		pipe.Position = new Vector2(SpawnPositionX, randomGapY);
 
