@@ -1,0 +1,85 @@
+% ============================================
+% Game Entities
+% ============================================
+
+\chapter{Game Entities}
+
+\section{Bird}
+
+The player-controlled entity implemented as a \texttt{CharacterBody2D}.
+
+\subsection{Physics Constants}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Parameter} & \textbf{Value} & \textbf{Description} \\
+\hline
+Gravity & 980.0 & Downward acceleration (px/s\textsuperscript{2}) \\
+JumpVelocity & -350.0 & Upward impulse on input \\
+MaxRotationDown & $\pi/2$ & Maximum downward tilt (90\textdegree) \\
+MaxRotationUp & $-\pi/6$ & Maximum upward tilt (-30\textdegree) \\
+RotationSpeed & 0.003 & Rotation interpolation factor \\
+\hline
+\end{tabular}
+\caption{Bird physics parameters}
+\end{table}
+
+\subsection{Input Handling}
+
+The bird responds to:
+\begin{itemize}
+    \item \texttt{ui\_accept} action
+    \item Spacebar (\texttt{Key.Space})
+    \item Left mouse button (\texttt{MouseButton.Left})
+\end{itemize}
+
+\subsection{State Management}
+
+\begin{lstlisting}[language={[Sharp]C}]
+public void Kill()    // Sets _isAlive = false
+public void Reset()   // Restores initial state
+public bool IsAlive() // State getter
+\end{lstlisting}
+
+\section{Pipe}
+
+Obstacle entity implemented as \texttt{Area2D} with collision detection.
+
+\subsection{Configuration}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Parameter} & \textbf{Value} & \textbf{Description} \\
+\hline
+ScrollSpeed & 150.0 (static) & Horizontal movement speed \\
+DestroyPositionX & -200.0 & X position for cleanup \\
+\hline
+\end{tabular}
+\caption{Pipe configuration}
+\end{table}
+
+\subsection{Signals}
+
+\begin{lstlisting}[language={[Sharp]C}]
+public delegate void PipePassedEventHandler();
+\end{lstlisting}
+
+Emitted when pipe passes the bird's X position (100px threshold).
+
+\subsection{Collision Handling}
+
+On \texttt{BodyEntered}: If body is \texttt{Bird}, calls \texttt{bird.Kill()}.
+
+\section{Ground}
+
+Static collision boundary implemented as \texttt{StaticBody2D}.
+
+\begin{itemize}
+    \item Position: Y = 1030
+    \item Collision shape: Rectangle 1920 $\times$ 100
+    \item Visual: \texttt{TextureRect} with \texttt{borderBG.png}
+\end{itemize}
