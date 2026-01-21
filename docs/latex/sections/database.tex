@@ -1,0 +1,115 @@
+% ============================================
+% Database Architecture
+% ============================================
+
+\chapter{Database Architecture}
+
+\section{Overview}
+
+SQLite database using \texttt{Microsoft.Data.Sqlite}. Database file stored at \texttt{OS.GetUserDataDir()/flappy\_bird\_stats.db}.
+
+\section{Schema}
+
+\subsection{GameStatistics Table}
+
+Singleton record (Id = 1) for aggregate statistics.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Column} & \textbf{Type} & \textbf{Description} \\
+\hline
+Id & INTEGER & Primary key (autoincrement) \\
+HighScore & INTEGER & All-time highest score \\
+TotalGamesPlayed & INTEGER & Total game sessions \\
+TotalDeaths & INTEGER & Total death count \\
+TotalPipesPassed & INTEGER & Cumulative pipes passed \\
+LastPlayedDate & TEXT & ISO 8601 timestamp \\
+AverageScore & INTEGER & Calculated average score \\
+\hline
+\end{tabular}
+\caption{GameStatistics schema}
+\end{table}
+
+\subsection{GameSessions Table}
+
+Individual session records for history tracking.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Column} & \textbf{Type} & \textbf{Description} \\
+\hline
+Id & INTEGER & Primary key (autoincrement) \\
+Score & INTEGER & Session final score \\
+PipesPassed & INTEGER & Pipes passed in session \\
+PlayedDate & TEXT & ISO 8601 timestamp \\
+SessionDuration & REAL & Duration in seconds \\
+\hline
+\end{tabular}
+\caption{GameSessions schema}
+\end{table}
+
+\section{Data Models}
+
+\subsection{GameStatistics}
+
+\begin{lstlisting}[language={[Sharp]C}]
+public class GameStatistics
+{
+    public int Id { get; set; }
+    public int HighScore { get; set; }
+    public int TotalGamesPlayed { get; set; }
+    public int TotalDeaths { get; set; }
+    public int TotalPipesPassed { get; set; }
+    public DateTime LastPlayedDate { get; set; }
+    public int AverageScore { get; set; }
+}
+\end{lstlisting}
+
+\subsection{GameSession}
+
+\begin{lstlisting}[language={[Sharp]C}]
+public class GameSession
+{
+    public int Id { get; set; }
+    public int Score { get; set; }
+    public int PipesPassed { get; set; }
+    public DateTime PlayedDate { get; set; }
+    public double SessionDuration { get; set; }
+}
+\end{lstlisting}
+
+\section{DatabaseService API}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Method} & \textbf{Description} \\
+\hline
+\texttt{SaveGameSession(score, pipes, duration)} & Persists session and updates stats \\
+\texttt{GetStatistics()} & Returns \texttt{GameStatistics} record \\
+\texttt{GetRecentSessions(limit)} & Returns last N sessions \\
+\texttt{ResetAllStatistics()} & Clears all data \\
+\hline
+\end{tabular}
+\caption{DatabaseService public methods}
+\end{table}
+
+\section{Transaction Handling}
+
+All write operations use transactions with rollback on exception:
+
+\begin{lstlisting}[language={[Sharp]C}]
+using var transaction = connection.BeginTransaction();
+try {
+    // Insert/Update operations
+    transaction.Commit();
+} catch {
+    transaction.Rollback();
+    throw;
+}
+\end{lstlisting}
