@@ -48,6 +48,7 @@ public partial class GameManager : Node
 		if (_bird != null)
 		{
 			_bird.Position = new Vector2(BirdStartX, BirdStartY);
+			_bird.Died += OnBirdDied;
 		}
 
 		if (_coinSpawner != null)
@@ -65,9 +66,54 @@ public partial class GameManager : Node
 			if (_bird != null && !_bird.IsAlive())
 			{
 				EndGame();
+				return;
 			}
 
 			CheckBirdOutOfBounds();
+			CheckPipeCollision();
+		}
+	}
+
+	private void CheckPipeCollision()
+	{
+		if (_bird == null || !_bird.IsAlive())
+			return;
+
+		Vector2 birdPos = _bird.Position;
+		float birdRadius = 20.0f;
+
+		Godot.Collections.Array<Node> pipes = GetTree().GetNodesInGroup("pipes");
+		foreach (Node node in pipes)
+		{
+			if (node is Pipe pipe)
+			{
+				float pipeX = pipe.Position.X;
+				float pipeY = pipe.Position.Y;
+				float pipeHalfWidth = 104.0f;
+
+				if (birdPos.X + birdRadius > pipeX - pipeHalfWidth &&
+				    birdPos.X - birdRadius < pipeX + pipeHalfWidth)
+				{
+					float upperPipeBottom = pipeY - 310.0f;
+					float lowerPipeTop = pipeY + 110.0f;
+
+					if (birdPos.Y - birdRadius < upperPipeBottom ||
+					    birdPos.Y + birdRadius > lowerPipeTop)
+					{
+						_bird.Kill();
+						EndGame();
+						return;
+					}
+				}
+			}
+		}
+	}
+
+	private void OnBirdDied()
+	{
+		if (_currentState == GameState.Playing)
+		{
+			EndGame();
 		}
 	}
 
@@ -111,23 +157,21 @@ public partial class GameManager : Node
 
 	public void EndGame()
 	{
-		if (_currentState != GameState.Playing)
+		GD.Print("EndGame called");
+		if (_currentState == GameState.GameOver)
 			return;
 
 		_currentState = GameState.GameOver;
 
-		if (_spawnManager != null)
-		{
-			_spawnManager.StopSpawning();
-		}
+		_spawnManager?.StopSpawning();
+		_coinSpawner?.StopSpawning();
 
-		if (_coinSpawner != null)
+		try
 		{
-			_coinSpawner.StopSpawning();
+			double sessionDuration = (DateTime.Now - _sessionStartTime).TotalSeconds;
+			_databaseService?.SaveGameSession(_score, _score, _coinsCollected, sessionDuration);
 		}
-
-		double sessionDuration = (DateTime.Now - _sessionStartTime).TotalSeconds;
-		_databaseService.SaveGameSession(_score, _score, _coinsCollected, sessionDuration);
+		catch (Exception) { }
 
 		EmitSignal(SignalName.GameOver, _score);
 	}
