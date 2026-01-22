@@ -6,15 +6,14 @@ public partial class Bird : CharacterBody2D
 {
 	private const float Gravity = 980.0f;
 	private const float JumpVelocity = -350.0f;
-	private const float MaxRotationDown = Mathf.Pi / 2; // 90 degrees
-	private const float MaxRotationUp = -Mathf.Pi / 6; // -30 degrees
+	private const float MaxRotationDown = Mathf.Pi / 2;
+	private const float MaxRotationUp = -Mathf.Pi / 6;
 	private const float RotationSpeed = 0.003f;
+	private const float GroundY = 1000.0f;
 	private bool _isAlive = true;
 
-	public override void _Ready()
-	{
-		// Initialization
-	}
+	[Signal]
+	public delegate void DiedEventHandler();
 
 	public override void _PhysicsProcess(double delta)
 	{
@@ -40,10 +39,10 @@ public partial class Bird : CharacterBody2D
 		Rotation = targetRotation;
 
 		Velocity = velocity;
-
 		MoveAndSlide();
 
-		if (IsOnFloor())
+		// Die if on floor or past ground level
+		if (IsOnFloor() || Position.Y >= GroundY)
 		{
 			Kill();
 		}
@@ -51,7 +50,10 @@ public partial class Bird : CharacterBody2D
 
 	public void Kill()
 	{
+		if (!_isAlive)
+			return;
 		_isAlive = false;
+		EmitSignal(SignalName.Died);
 	}
 
 	public void Reset()
