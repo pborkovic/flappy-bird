@@ -41,7 +41,12 @@ position = Vector2(0, 1030)
 
 [node name="UI" parent="." instance=ExtResource("6_ui")]
 GameManagerPath = NodePath("../GameManager")
-StartButtonPath = NodePath("StartButton")
+StartMenuContainerPath = NodePath("StartMenuContainer")
+StartButtonPath = NodePath("StartMenuContainer/StartButton")
+MenuHighScoreLabelPath = NodePath("StartMenuContainer/HighScoreLabel")
+TotalGamesLabelPath = NodePath("StartMenuContainer/TotalGamesLabel")
+TotalCoinsLabelPath = NodePath("StartMenuContainer/TotalCoinsLabel")
+AverageScoreLabelPath = NodePath("StartMenuContainer/AverageScoreLabel")
 ScoreLabelPath = NodePath("ScoreLabel")
 CoinLabelPath = NodePath("CoinLabel")
 GameOverContainerPath = NodePath("GameOverContainer")
