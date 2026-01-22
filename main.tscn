@@ -1,8 +1,9 @@
-[gd_scene load_steps=8 format=3 uid="uid://bhjufbmjrttwt"]
+[gd_scene load_steps=9 format=3 uid="uid://bhjufbmjrttwt"]
 
 [ext_resource type="Texture2D" uid="uid://c0duvojep0ujs" path="res://assets/backgroundSundown.png" id="1_ig7tw"]
 [ext_resource type="Script" path="res://Scripts/Managers/GameManager.cs" id="2_gm"]
 [ext_resource type="Script" path="res://Scripts/Managers/SpawnManager.cs" id="3_sm"]
+[ext_resource type="Script" path="res://Scripts/Managers/CoinSpawner.cs" id="3_cs"]
 [ext_resource type="PackedScene" uid="uid://bumdofox3kqfd" path="res://eder_bird.tscn" id="4_bird"]
 [ext_resource type="PackedScene" uid="uid://djh8k3m9v4q2p" path="res://ground.tscn" id="5_ground"]
 [ext_resource type="PackedScene" uid="uid://bv2k8m3p9x4q1" path="res://ui.tscn" id="6_ui"]
@@ -21,9 +22,13 @@ stretch_mode = 6
 script = ExtResource("2_gm")
 BirdPath = NodePath("../EderBird")
 SpawnManagerPath = NodePath("../SpawnManager")
+CoinSpawnerPath = NodePath("../CoinSpawner")
 
 [node name="SpawnManager" type="Node" parent="."]
 script = ExtResource("3_sm")
+
+[node name="CoinSpawner" type="Node" parent="."]
+script = ExtResource("3_cs")
 
 [node name="EderBird" parent="." instance=ExtResource("4_bird")]
 position = Vector2(200, 540)
@@ -37,7 +42,9 @@ position = Vector2(0, 1030)
 GameManagerPath = NodePath("../GameManager")
 StartButtonPath = NodePath("StartButton")
 ScoreLabelPath = NodePath("ScoreLabel")
+CoinLabelPath = NodePath("CoinLabel")
 GameOverContainerPath = NodePath("GameOverContainer")
 FinalScoreLabelPath = NodePath("GameOverContainer/FinalScoreLabel")
 HighScoreLabelPath = NodePath("GameOverContainer/HighScoreLabel")
+CoinsCollectedLabelPath = NodePath("GameOverContainer/CoinsCollectedLabel")
 RestartButtonPath = NodePath("GameOverContainer/RestartButton")
