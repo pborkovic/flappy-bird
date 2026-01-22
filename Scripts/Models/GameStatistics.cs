@@ -9,6 +9,7 @@ public class GameStatistics
 	public int TotalGamesPlayed { get; set; }
 	public int TotalDeaths { get; set; }
 	public int TotalPipesPassed { get; set; }
+	public int TotalCoinsCollected { get; set; }
 	public DateTime LastPlayedDate { get; set; }
 	public int AverageScore { get; set; }
 }
