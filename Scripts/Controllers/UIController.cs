@@ -9,16 +9,20 @@ public partial class UIController : CanvasLayer
 	[Export] public NodePath GameManagerPath;
 	[Export] public NodePath StartButtonPath;
 	[Export] public NodePath ScoreLabelPath;
+	[Export] public NodePath CoinLabelPath;
 	[Export] public NodePath GameOverContainerPath;
 	[Export] public NodePath FinalScoreLabelPath;
 	[Export] public NodePath HighScoreLabelPath;
+	[Export] public NodePath CoinsCollectedLabelPath;
 	[Export] public NodePath RestartButtonPath;
 	private GameManager _gameManager;
 	private Button _startButton;
 	private Label _scoreLabel;
+	private Label _coinLabel;
 	private Control _gameOverContainer;
 	private Label _finalScoreLabel;
 	private Label _highScoreLabel;
+	private Label _coinsCollectedLabel;
 	private Button _restartButton;
 
 	public override void _Ready()
@@ -35,6 +39,11 @@ public partial class UIController : CanvasLayer
 			_scoreLabel = GetNode<Label>(ScoreLabelPath);
 		}
 
+		if (CoinLabelPath != null && !CoinLabelPath.IsEmpty)
+		{
+			_coinLabel = GetNode<Label>(CoinLabelPath);
+		}
+
 		if (GameOverContainerPath != null && !GameOverContainerPath.IsEmpty)
 		{
 			_gameOverContainer = GetNode<Control>(GameOverContainerPath);
@@ -48,6 +57,11 @@ public partial class UIController : CanvasLayer
 		if (HighScoreLabelPath != null && !HighScoreLabelPath.IsEmpty)
 		{
 			_highScoreLabel = GetNode<Label>(HighScoreLabelPath);
+		}
+
+		if (CoinsCollectedLabelPath != null && !CoinsCollectedLabelPath.IsEmpty)
+		{
+			_coinsCollectedLabel = GetNode<Label>(CoinsCollectedLabelPath);
 		}
 
 		if (RestartButtonPath != null && !RestartButtonPath.IsEmpty)
@@ -76,6 +90,7 @@ public partial class UIController : CanvasLayer
 			_gameManager.GameStarted += OnGameStarted;
 			_gameManager.GameOver += OnGameOver;
 			_gameManager.ScoreChanged += OnScoreChanged;
+			_gameManager.CoinsChanged += OnCoinsChanged;
 		}
 	}
 
@@ -107,6 +122,14 @@ public partial class UIController : CanvasLayer
 		}
 	}
 
+	private void OnCoinsChanged(int totalCoins)
+	{
+		if (_coinLabel != null)
+		{
+			_coinLabel.Text = $"Coins: {totalCoins}";
+		}
+	}
+
 	private void ShowMenuUI()
 	{
 		if (_startButton != null)
@@ -117,6 +140,11 @@ public partial class UIController : CanvasLayer
 		if (_scoreLabel != null)
 		{
 			_scoreLabel.Visible = false;
+		}
+
+		if (_coinLabel != null)
+		{
+			_coinLabel.Visible = false;
 		}
 
 		if (_gameOverContainer != null)
@@ -138,6 +166,12 @@ public partial class UIController : CanvasLayer
 			_scoreLabel.Text = "0";
 		}
 
+		if (_coinLabel != null)
+		{
+			_coinLabel.Visible = true;
+			_coinLabel.Text = "Coins: 0";
+		}
+
 		if (_gameOverContainer != null)
 		{
 			_gameOverContainer.Visible = false;
@@ -156,6 +190,11 @@ public partial class UIController : CanvasLayer
 			_scoreLabel.Visible = false;
 		}
 
+		if (_coinLabel != null)
+		{
+			_coinLabel.Visible = false;
+		}
+
 		if (_gameOverContainer != null)
 		{
 			_gameOverContainer.Visible = true;
@@ -170,6 +209,11 @@ public partial class UIController : CanvasLayer
 		{
 			GameStatistics stats = _gameManager.GetDatabaseService().GetStatistics();
 			_highScoreLabel.Text = $"High Score: {stats.HighScore}";
+		}
+
+		if (_coinsCollectedLabel != null && _gameManager != null)
+		{
+			_coinsCollectedLabel.Text = $"Coins: {_gameManager.GetCoinsCollected()}";
 		}
 	}
 }
