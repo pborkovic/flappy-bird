@@ -174,7 +174,7 @@ public class DatabaseService
 		using SqliteConnection connection = new SqliteConnection(_connectionString);
 		connection.Open();
 
-		string query = "SELECT * FROM GameStatistics WHERE Id = 1";
+		string query = "SELECT Id, HighScore, TotalGamesPlayed, TotalDeaths, TotalPipesPassed, TotalCoinsCollected, LastPlayedDate, AverageScore FROM GameStatistics WHERE Id = 1";
 
 		using SqliteCommand command = new SqliteCommand(query, connection);
 		using SqliteDataReader reader = command.ExecuteReader();
@@ -183,14 +183,14 @@ public class DatabaseService
 		{
 			return new GameStatistics
 			{
-				Id = reader.GetInt32(0),
-				HighScore = reader.GetInt32(1),
-				TotalGamesPlayed = reader.GetInt32(2),
-				TotalDeaths = reader.GetInt32(3),
-				TotalPipesPassed = reader.GetInt32(4),
-				TotalCoinsCollected = reader.GetInt32(5),
-				LastPlayedDate = DateTime.Parse(reader.GetString(6)),
-				AverageScore = reader.GetInt32(7)
+				Id = reader.GetInt32(reader.GetOrdinal("Id")),
+				HighScore = reader.GetInt32(reader.GetOrdinal("HighScore")),
+				TotalGamesPlayed = reader.GetInt32(reader.GetOrdinal("TotalGamesPlayed")),
+				TotalDeaths = reader.GetInt32(reader.GetOrdinal("TotalDeaths")),
+				TotalPipesPassed = reader.GetInt32(reader.GetOrdinal("TotalPipesPassed")),
+				TotalCoinsCollected = reader.GetInt32(reader.GetOrdinal("TotalCoinsCollected")),
+				LastPlayedDate = DateTime.Parse(reader.GetString(reader.GetOrdinal("LastPlayedDate"))),
+				AverageScore = reader.GetInt32(reader.GetOrdinal("AverageScore"))
 			};
 		}
 
@@ -204,7 +204,7 @@ public class DatabaseService
 		using SqliteConnection connection = new SqliteConnection(_connectionString);
 		connection.Open();
 
-		string query = "SELECT * FROM GameSessions ORDER BY PlayedDate DESC LIMIT @limit";
+		string query = "SELECT Id, Score, PipesPassed, CoinsCollected, PlayedDate, SessionDuration FROM GameSessions ORDER BY PlayedDate DESC LIMIT @limit";
 
 		using SqliteCommand command = new SqliteCommand(query, connection);
 		command.Parameters.AddWithValue("@limit", limit);
@@ -215,12 +215,12 @@ public class DatabaseService
 		{
 			sessions.Add(new GameSession
 			{
-				Id = reader.GetInt32(0),
-				Score = reader.GetInt32(1),
-				PipesPassed = reader.GetInt32(2),
-				CoinsCollected = reader.GetInt32(3),
-				PlayedDate = DateTime.Parse(reader.GetString(4)),
-				SessionDuration = reader.GetDouble(5)
+				Id = reader.GetInt32(reader.GetOrdinal("Id")),
+				Score = reader.GetInt32(reader.GetOrdinal("Score")),
+				PipesPassed = reader.GetInt32(reader.GetOrdinal("PipesPassed")),
+				CoinsCollected = reader.GetInt32(reader.GetOrdinal("CoinsCollected")),
+				PlayedDate = DateTime.Parse(reader.GetString(reader.GetOrdinal("PlayedDate"))),
+				SessionDuration = reader.GetDouble(reader.GetOrdinal("SessionDuration"))
 			});
 		}
 
