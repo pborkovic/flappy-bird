@@ -9,18 +9,23 @@ public partial class SpawnManager : Node
 	private const float SpawnPositionX = 2000.0f;
 	private const float MinGapY = 400.0f;
 	private const float MaxGapY = 650.0f;
+	[Export] public NodePath CoinSpawnerPath;
 	private PackedScene _pipeScene;
 	private Timer _spawnTimer;
+	private CoinSpawner _coinSpawner;
 	private bool _isSpawning = false;
 
 	public override void _Ready()
 	{
 		_pipeScene = GD.Load<PackedScene>("res://pipe.tscn");
 
+		if (CoinSpawnerPath != null)
+			_coinSpawner = GetNodeOrNull<CoinSpawner>(CoinSpawnerPath);
+
 		_spawnTimer = new Timer();
 		_spawnTimer.WaitTime = SpawnInterval;
 		_spawnTimer.Timeout += OnSpawnTimerTimeout;
-		
+
 		AddChild(_spawnTimer);
 	}
 
@@ -65,12 +70,17 @@ public partial class SpawnManager : Node
 
 		Pipe pipe = _pipeScene.Instantiate<Pipe>();
 		float randomGapY = (float)GD.RandRange(MinGapY, MaxGapY);
-		
+
 		pipe.Position = new Vector2(SpawnPositionX, randomGapY);
 
 		pipe.AddToGroup("pipes");
 
 		GetParent().AddChild(pipe);
+
+		if (_coinSpawner != null)
+		{
+			_coinSpawner.TrySpawnCoinAtGap(randomGapY, SpawnPositionX);
+		}
 	}
 
 	public void SetSpawnInterval(float interval)
