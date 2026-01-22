@@ -32,6 +32,7 @@ script = ExtResource("1_weather")
 NightOverlayPath = NodePath("../NightOverlay")
 RainParticlesPath = NodePath("../RainParticles")
 FogOverlayPath = NodePath("../FogOverlay")
+BirdLightPath = NodePath("../../EderBird/NightLight")
 
 [node name="NightOverlay" type="ColorRect" parent="."]
 anchors_preset = 15
