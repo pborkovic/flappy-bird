@@ -8,11 +8,14 @@ public partial class WeatherController : Node
     [Export] public NodePath NightOverlayPath;
     [Export] public NodePath RainParticlesPath;
     [Export] public NodePath FogOverlayPath;
+    [Export] public NodePath BirdLightPath;
     private const float WeatherChangeInterval = 30.0f;
     private const float TransitionDuration = 2.0f;
+    private const float NightLightEnergy = 0.8f;
     private ColorRect _nightOverlay;
     private GpuParticles2D _rainParticles;
     private ColorRect _fogOverlay;
+    private PointLight2D _birdLight;
     private WeatherType _currentWeather = WeatherType.Clear;
     private TimeOfDay _currentTimeOfDay = TimeOfDay.Day;
     private float _weatherTimer = 0.0f;
@@ -27,6 +30,8 @@ public partial class WeatherController : Node
             _rainParticles = GetNodeOrNull<GpuParticles2D>(RainParticlesPath);
         if (FogOverlayPath != null)
             _fogOverlay = GetNodeOrNull<ColorRect>(FogOverlayPath);
+        if (BirdLightPath != null)
+            _birdLight = GetNodeOrNull<PointLight2D>(BirdLightPath);
 
         InitializeOverlays();
     }
@@ -62,6 +67,11 @@ public partial class WeatherController : Node
         if (_rainParticles != null)
         {
             _rainParticles.Emitting = false;
+        }
+
+        if (_birdLight != null)
+        {
+            _birdLight.Energy = 0.0f;
         }
     }
 
@@ -133,17 +143,22 @@ public partial class WeatherController : Node
     {
         _currentTween?.Kill();
         _currentTween = CreateTween();
+        _currentTween.SetParallel(true);
 
         switch (_currentTimeOfDay)
         {
             case TimeOfDay.Day:
                 if (_nightOverlay != null)
                     _currentTween.TweenProperty(_nightOverlay, "color:a", 0.0f, TransitionDuration);
+                if (_birdLight != null)
+                    _currentTween.TweenProperty(_birdLight, "energy", 0.0f, TransitionDuration);
                 break;
 
             case TimeOfDay.Night:
                 if (_nightOverlay != null)
                     _currentTween.TweenProperty(_nightOverlay, "color:a", 0.6f, TransitionDuration);
+                if (_birdLight != null)
+                    _currentTween.TweenProperty(_birdLight, "energy", NightLightEnergy, TransitionDuration);
                 break;
         }
     }
@@ -156,6 +171,8 @@ public partial class WeatherController : Node
     public void ResetWeather()
     {
         _weatherTimer = 0.0f;
+        if (_birdLight != null)
+            _birdLight.Energy = 0.0f;
         SetWeather(WeatherType.Clear);
         SetTimeOfDay(TimeOfDay.Day);
     }
