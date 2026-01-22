@@ -5,16 +5,12 @@ namespace Flappy_Bird.Scripts.Managers;
 
 public partial class CoinSpawner : Node
 {
-	private const float SpawnInterval = 2.5f;
-	private const float SpawnPositionX = 2000.0f;
-	private const float MinGapY = 400.0f;
-	private const float MaxGapY = 650.0f;
 	private const float UpperPipeTip = -310.0f;
 	private const float LowerPipeTip = 110.0f;
-	private const float CoinMargin = 50.0f;
+	private const float CoinMargin = 60.0f;
+	private const float CoinSpawnChance = 0.7f;
 
 	private PackedScene _coinScene;
-	private Timer _spawnTimer;
 	private bool _isSpawning = false;
 	private int _coinsCollected = 0;
 
@@ -24,25 +20,17 @@ public partial class CoinSpawner : Node
 	public override void _Ready()
 	{
 		_coinScene = GD.Load<PackedScene>("res://coin.tscn");
-
-		_spawnTimer = new Timer();
-		_spawnTimer.WaitTime = SpawnInterval;
-		_spawnTimer.Timeout += OnSpawnTimerTimeout;
-
-		AddChild(_spawnTimer);
 	}
 
 	public void StartSpawning()
 	{
 		_isSpawning = true;
 		_coinsCollected = 0;
-		_spawnTimer.Start();
 	}
 
 	public void StopSpawning()
 	{
 		_isSpawning = false;
-		_spawnTimer.Stop();
 	}
 
 	public void ClearAllCoins()
@@ -55,29 +43,22 @@ public partial class CoinSpawner : Node
 		}
 	}
 
-	private void OnSpawnTimerTimeout()
+	public void TrySpawnCoinAtGap(float gapY, float positionX)
 	{
-		if (_isSpawning)
-		{
-			SpawnCoin();
-		}
-	}
+		if (!_isSpawning || _coinScene == null)
+			return;
 
-	private void SpawnCoin()
-	{
-		if (_coinScene == null)
+		if (GD.Randf() > CoinSpawnChance)
 			return;
 
 		Coin coin = _coinScene.Instantiate<Coin>();
 
-		float pipeGapY = (float)GD.RandRange(MinGapY, MaxGapY);
-
-		float safeMinY = pipeGapY + UpperPipeTip + CoinMargin;
-		float safeMaxY = pipeGapY + LowerPipeTip - CoinMargin;
+		float safeMinY = gapY + UpperPipeTip + CoinMargin;
+		float safeMaxY = gapY + LowerPipeTip - CoinMargin;
 
 		float coinY = (float)GD.RandRange(safeMinY, safeMaxY);
 
-		coin.Position = new Vector2(SpawnPositionX, coinY);
+		coin.Position = new Vector2(positionX, coinY);
 		coin.AddToGroup("coins");
 
 		coin.CoinCollected += OnCoinCollected;
@@ -92,12 +73,4 @@ public partial class CoinSpawner : Node
 	}
 
 	public int GetCoinsCollected() => _coinsCollected;
-
-	public void SetSpawnInterval(float interval)
-	{
-		if (_spawnTimer != null)
-		{
-			_spawnTimer.WaitTime = interval;
-		}
-	}
 }
