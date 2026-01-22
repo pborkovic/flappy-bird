@@ -13,12 +13,15 @@ public partial class GameManager : Node
 	private const float BirdStartY = 540.0f;
 	[Export] public NodePath BirdPath;
 	[Export] public NodePath SpawnManagerPath;
+	[Export] public NodePath CoinSpawnerPath;
 	private Bird _bird;
 	private SpawnManager _spawnManager;
+	private CoinSpawner _coinSpawner;
 	private DatabaseService _databaseService;
 	private DifficultyScaler _difficultyScaler;
 	private GameState _currentState = GameState.Menu;
 	private int _score = 0;
+	private int _coinsCollected = 0;
 	private DateTime _sessionStartTime;
 
 	[Signal]
@@ -30,16 +33,26 @@ public partial class GameManager : Node
 	[Signal]
 	public delegate void ScoreChangedEventHandler(int newScore);
 
+	[Signal]
+	public delegate void CoinsChangedEventHandler(int totalCoins);
+
 	public override void _Ready()
 	{
 		_bird = GetNode<Bird>(BirdPath);
 		_spawnManager = GetNode<SpawnManager>(SpawnManagerPath);
+		if (CoinSpawnerPath != null)
+			_coinSpawner = GetNodeOrNull<CoinSpawner>(CoinSpawnerPath);
 		_databaseService = new DatabaseService();
 		_difficultyScaler = new DifficultyScaler();
 
 		if (_bird != null)
 		{
 			_bird.Position = new Vector2(BirdStartX, BirdStartY);
+		}
+
+		if (_coinSpawner != null)
+		{
+			_coinSpawner.CoinCollected += OnCoinCollected;
 		}
 
 		ConnectPipeSignals();
@@ -65,10 +78,12 @@ public partial class GameManager : Node
 
 		_currentState = GameState.Playing;
 		_score = 0;
+		_coinsCollected = 0;
 		_sessionStartTime = DateTime.Now;
 
 		_difficultyScaler.Reset();
 		Pipe.ScrollSpeed = _difficultyScaler.GetScrollSpeed();
+		Coin.ScrollSpeed = _difficultyScaler.GetScrollSpeed();
 
 		if (_bird != null)
 		{
@@ -83,8 +98,15 @@ public partial class GameManager : Node
 			_spawnManager.StartSpawning();
 		}
 
+		if (_coinSpawner != null)
+		{
+			_coinSpawner.ClearAllCoins();
+			_coinSpawner.StartSpawning();
+		}
+
 		EmitSignal(SignalName.GameStarted);
 		EmitSignal(SignalName.ScoreChanged, _score);
+		EmitSignal(SignalName.CoinsChanged, _coinsCollected);
 	}
 
 	public void EndGame()
@@ -99,8 +121,13 @@ public partial class GameManager : Node
 			_spawnManager.StopSpawning();
 		}
 
+		if (_coinSpawner != null)
+		{
+			_coinSpawner.StopSpawning();
+		}
+
 		double sessionDuration = (DateTime.Now - _sessionStartTime).TotalSeconds;
-		_databaseService.SaveGameSession(_score, _score, sessionDuration);
+		_databaseService.SaveGameSession(_score, _score, _coinsCollected, sessionDuration);
 
 		EmitSignal(SignalName.GameOver, _score);
 	}
@@ -125,6 +152,12 @@ public partial class GameManager : Node
 			_spawnManager.ClearAllPipes();
 		}
 
+		if (_coinSpawner != null)
+		{
+			_coinSpawner.StopSpawning();
+			_coinSpawner.ClearAllCoins();
+		}
+
 		if (_bird != null)
 		{
 			_bird.Reset();
@@ -132,6 +165,7 @@ public partial class GameManager : Node
 		}
 
 		_score = 0;
+		_coinsCollected = 0;
 	}
 
 	private void CheckBirdOutOfBounds()
@@ -170,6 +204,7 @@ public partial class GameManager : Node
 
 		_difficultyScaler.UpdateDifficulty(_score);
 		Pipe.ScrollSpeed = _difficultyScaler.GetScrollSpeed();
+		Coin.ScrollSpeed = _difficultyScaler.GetScrollSpeed();
 
 		if (_spawnManager != null)
 		{
@@ -179,9 +214,20 @@ public partial class GameManager : Node
 		EmitSignal(SignalName.ScoreChanged, _score);
 	}
 
+	private void OnCoinCollected(int totalCoins)
+	{
+		if (_currentState != GameState.Playing)
+			return;
+
+		_coinsCollected = totalCoins;
+		EmitSignal(SignalName.CoinsChanged, _coinsCollected);
+	}
+
 	public GameState GetCurrentState() => _currentState;
 
 	public int GetScore() => _score;
+
+	public int GetCoinsCollected() => _coinsCollected;
 
 	public DatabaseService GetDatabaseService() => _databaseService;
 
