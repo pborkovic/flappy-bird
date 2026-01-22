@@ -26,6 +26,7 @@ CoinSpawnerPath = NodePath("../CoinSpawner")
 
 [node name="SpawnManager" type="Node" parent="."]
 script = ExtResource("3_sm")
+CoinSpawnerPath = NodePath("../CoinSpawner")
 
 [node name="CoinSpawner" type="Node" parent="."]
 script = ExtResource("3_cs")

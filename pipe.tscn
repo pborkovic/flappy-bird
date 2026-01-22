@@ -1,9 +1,18 @@
-[gd_scene load_steps=3 format=3 uid="uid://cc8mcdggpqdnc"]
+[gd_scene load_steps=5 format=3 uid="uid://cc8mcdggpqdnc"]
 
 [ext_resource type="Script" path="res://Scripts/Entities/Pipe.cs" id="1_a2b3c"]
 [ext_resource type="Texture2D" uid="uid://n48u1tu680vh" path="res://assets/tubeFB.png" id="1_bepn3"]
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_upper"]
+size = Vector2(208, 1280)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_lower"]
+size = Vector2(208, 1280)
+
 [node name="Pipe" type="Area2D"]
+collision_layer = 2
+collision_mask = 1
+monitoring = true
 script = ExtResource("1_a2b3c")
 
 [node name="Upper" type="Sprite2D" parent="."]
@@ -12,19 +21,15 @@ scale = Vector2(4, 4)
 texture = ExtResource("1_bepn3")
 flip_v = true
 
-[node name="UpperCap" type="CollisionPolygon2D" parent="."]
-polygon = PackedVector2Array(-104, -310, 104, -310, 104, -410, -104, -410)
-
-[node name="UpperBody" type="CollisionPolygon2D" parent="."]
-polygon = PackedVector2Array(-92, -410, 92, -410, 92, -1590, -92, -1590)
+[node name="UpperCollision" type="CollisionShape2D" parent="."]
+position = Vector2(0, -950)
+shape = SubResource("RectangleShape2D_upper")
 
 [node name="Lower" type="Sprite2D" parent="."]
 position = Vector2(0, 750)
 scale = Vector2(4, 4)
 texture = ExtResource("1_bepn3")
 
-[node name="LowerCap" type="CollisionPolygon2D" parent="."]
-polygon = PackedVector2Array(-104, 110, 104, 110, 104, 210, -104, 210)
-
-[node name="LowerBody" type="CollisionPolygon2D" parent="."]
-polygon = PackedVector2Array(-92, 210, 92, 210, 92, 1390, -92, 1390)
+[node name="LowerCollision" type="CollisionShape2D" parent="."]
+position = Vector2(0, 750)
+shape = SubResource("RectangleShape2D_lower")
