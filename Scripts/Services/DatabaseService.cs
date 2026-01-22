@@ -30,6 +30,7 @@ public class DatabaseService
 				TotalGamesPlayed INTEGER NOT NULL DEFAULT 0,
 				TotalDeaths INTEGER NOT NULL DEFAULT 0,
 				TotalPipesPassed INTEGER NOT NULL DEFAULT 0,
+				TotalCoinsCollected INTEGER NOT NULL DEFAULT 0,
 				LastPlayedDate TEXT NOT NULL,
 				AverageScore INTEGER NOT NULL DEFAULT 0
 			)";
@@ -39,6 +40,7 @@ public class DatabaseService
 				Id INTEGER PRIMARY KEY AUTOINCREMENT,
 				Score INTEGER NOT NULL,
 				PipesPassed INTEGER NOT NULL,
+				CoinsCollected INTEGER NOT NULL DEFAULT 0,
 				PlayedDate TEXT NOT NULL,
 				SessionDuration REAL NOT NULL
 			)";
@@ -53,7 +55,31 @@ public class DatabaseService
 			command.ExecuteNonQuery();
 		}
 
+		MigrateDatabase(connection);
 		EnsureStatisticsRecordExists(connection);
+	}
+
+	private void MigrateDatabase(SqliteConnection connection)
+	{
+		try
+		{
+			using (SqliteCommand command = new SqliteCommand(
+				"ALTER TABLE GameStatistics ADD COLUMN TotalCoinsCollected INTEGER NOT NULL DEFAULT 0", connection))
+			{
+				command.ExecuteNonQuery();
+			}
+		}
+		catch (SqliteException) { }
+
+		try
+		{
+			using (SqliteCommand command = new SqliteCommand(
+				"ALTER TABLE GameSessions ADD COLUMN CoinsCollected INTEGER NOT NULL DEFAULT 0", connection))
+			{
+				command.ExecuteNonQuery();
+			}
+		}
+		catch (SqliteException) { }
 	}
 
 	private void EnsureStatisticsRecordExists(SqliteConnection connection)
@@ -65,8 +91,8 @@ public class DatabaseService
 		if (count == 0)
 		{
 			string insertQuery = @"
-				INSERT INTO GameStatistics (HighScore, TotalGamesPlayed, TotalDeaths, TotalPipesPassed, LastPlayedDate, AverageScore)
-				VALUES (0, 0, 0, 0, @date, 0)";
+				INSERT INTO GameStatistics (HighScore, TotalGamesPlayed, TotalDeaths, TotalPipesPassed, TotalCoinsCollected, LastPlayedDate, AverageScore)
+				VALUES (0, 0, 0, 0, 0, @date, 0)";
 
 			using SqliteCommand insertCommand = new SqliteCommand(insertQuery, connection);
 			insertCommand.Parameters.AddWithValue("@date", DateTime.Now.ToString("o"));
@@ -74,7 +100,7 @@ public class DatabaseService
 		}
 	}
 
-	public void SaveGameSession(int score, int pipesPassed, double sessionDuration)
+	public void SaveGameSession(int score, int pipesPassed, int coinsCollected, double sessionDuration)
 	{
 		using SqliteConnection connection = new SqliteConnection(_connectionString);
 		connection.Open();
@@ -84,19 +110,20 @@ public class DatabaseService
 		try
 		{
 			string insertSessionQuery = @"
-				INSERT INTO GameSessions (Score, PipesPassed, PlayedDate, SessionDuration)
-				VALUES (@score, @pipes, @date, @duration)";
+				INSERT INTO GameSessions (Score, PipesPassed, CoinsCollected, PlayedDate, SessionDuration)
+				VALUES (@score, @pipes, @coins, @date, @duration)";
 
 			using (SqliteCommand command = new SqliteCommand(insertSessionQuery, connection, transaction))
 			{
 				command.Parameters.AddWithValue("@score", score);
 				command.Parameters.AddWithValue("@pipes", pipesPassed);
+				command.Parameters.AddWithValue("@coins", coinsCollected);
 				command.Parameters.AddWithValue("@date", DateTime.Now.ToString("o"));
 				command.Parameters.AddWithValue("@duration", sessionDuration);
 				command.ExecuteNonQuery();
 			}
 
-			UpdateStatistics(connection, transaction, score, pipesPassed);
+			UpdateStatistics(connection, transaction, score, pipesPassed, coinsCollected);
 
 			transaction.Commit();
 		}
@@ -107,7 +134,7 @@ public class DatabaseService
 		}
 	}
 
-	private void UpdateStatistics(SqliteConnection connection, SqliteTransaction transaction, int score, int pipesPassed)
+	private void UpdateStatistics(SqliteConnection connection, SqliteTransaction transaction, int score, int pipesPassed, int coinsCollected)
 	{
 		GameStatistics stats = GetStatistics();
 
@@ -115,6 +142,7 @@ public class DatabaseService
 		int newTotalGames = stats.TotalGamesPlayed + 1;
 		int newTotalDeaths = stats.TotalDeaths + 1;
 		int newTotalPipes = stats.TotalPipesPassed + pipesPassed;
+		int newTotalCoins = stats.TotalCoinsCollected + coinsCollected;
 
 		int totalScore = (stats.AverageScore * stats.TotalGamesPlayed) + score;
 		int newAverageScore = totalScore / newTotalGames;
@@ -125,6 +153,7 @@ public class DatabaseService
 				TotalGamesPlayed = @totalGames,
 				TotalDeaths = @totalDeaths,
 				TotalPipesPassed = @totalPipes,
+				TotalCoinsCollected = @totalCoins,
 				LastPlayedDate = @date,
 				AverageScore = @avgScore
 			WHERE Id = 1";
@@ -134,6 +163,7 @@ public class DatabaseService
 		command.Parameters.AddWithValue("@totalGames", newTotalGames);
 		command.Parameters.AddWithValue("@totalDeaths", newTotalDeaths);
 		command.Parameters.AddWithValue("@totalPipes", newTotalPipes);
+		command.Parameters.AddWithValue("@totalCoins", newTotalCoins);
 		command.Parameters.AddWithValue("@date", DateTime.Now.ToString("o"));
 		command.Parameters.AddWithValue("@avgScore", newAverageScore);
 		command.ExecuteNonQuery();
@@ -158,8 +188,9 @@ public class DatabaseService
 				TotalGamesPlayed = reader.GetInt32(2),
 				TotalDeaths = reader.GetInt32(3),
 				TotalPipesPassed = reader.GetInt32(4),
-				LastPlayedDate = DateTime.Parse(reader.GetString(5)),
-				AverageScore = reader.GetInt32(6)
+				TotalCoinsCollected = reader.GetInt32(5),
+				LastPlayedDate = DateTime.Parse(reader.GetString(6)),
+				AverageScore = reader.GetInt32(7)
 			};
 		}
 
@@ -187,8 +218,9 @@ public class DatabaseService
 				Id = reader.GetInt32(0),
 				Score = reader.GetInt32(1),
 				PipesPassed = reader.GetInt32(2),
-				PlayedDate = DateTime.Parse(reader.GetString(3)),
-				SessionDuration = reader.GetDouble(4)
+				CoinsCollected = reader.GetInt32(3),
+				PlayedDate = DateTime.Parse(reader.GetString(4)),
+				SessionDuration = reader.GetDouble(5)
 			});
 		}
 
@@ -215,6 +247,7 @@ public class DatabaseService
 					TotalGamesPlayed = 0,
 					TotalDeaths = 0,
 					TotalPipesPassed = 0,
+					TotalCoinsCollected = 0,
 					LastPlayedDate = @date,
 					AverageScore = 0
 				WHERE Id = 1";
