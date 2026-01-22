@@ -12,13 +12,19 @@ scale = Vector2(4, 4)
 texture = ExtResource("1_bepn3")
 flip_v = true
 
-[node name="UpperCollision" type="CollisionPolygon2D" parent="."]
-polygon = PackedVector2Array(-104, -350, 104, -350, 104, -450, 92, -450, 92, -1580, -92, -1580, -92, -450, -104, -450)
+[node name="UpperCap" type="CollisionPolygon2D" parent="."]
+polygon = PackedVector2Array(-104, -310, 104, -310, 104, -410, -104, -410)
+
+[node name="UpperBody" type="CollisionPolygon2D" parent="."]
+polygon = PackedVector2Array(-92, -410, 92, -410, 92, -1590, -92, -1590)
 
 [node name="Lower" type="Sprite2D" parent="."]
 position = Vector2(0, 750)
 scale = Vector2(4, 4)
 texture = ExtResource("1_bepn3")
 
-[node name="LowerCollision" type="CollisionPolygon2D" parent="."]
-polygon = PackedVector2Array(-104, 150, 104, 150, 104, 250, 92, 250, 92, 1380, -92, 1380, -92, 250, -104, 250)
+[node name="LowerCap" type="CollisionPolygon2D" parent="."]
+polygon = PackedVector2Array(-104, 110, 104, 110, 104, 210, -104, 210)
+
+[node name="LowerBody" type="CollisionPolygon2D" parent="."]
+polygon = PackedVector2Array(-92, 210, 92, 210, 92, 1390, -92, 1390)
