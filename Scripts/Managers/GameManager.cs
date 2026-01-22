@@ -171,7 +171,10 @@ public partial class GameManager : Node
 			double sessionDuration = (DateTime.Now - _sessionStartTime).TotalSeconds;
 			_databaseService?.SaveGameSession(_score, _score, _coinsCollected, sessionDuration);
 		}
-		catch (Exception) { }
+		catch (Exception ex)
+		{
+			GD.PrintErr($"Failed to save game session: {ex.Message}");
+		}
 
 		EmitSignal(SignalName.GameOver, _score);
 	}
