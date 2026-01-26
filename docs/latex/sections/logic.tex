@@ -19,23 +19,6 @@ public enum GameState
 }
 \end{lstlisting}
 
-\subsection{State Transitions}
-
-\begin{figure}[h]
-\centering
-\begin{tikzpicture}[node distance=3cm, auto]
-    \node[draw, rounded corners] (menu) {Menu};
-    \node[draw, rounded corners, right of=menu] (playing) {Playing};
-    \node[draw, rounded corners, right of=playing] (gameover) {GameOver};
-
-    \draw[->] (menu) -- node[above] {StartGame()} (playing);
-    \draw[->] (playing) -- node[above] {EndGame()} (gameover);
-    \draw[->] (gameover) to[bend right=30] node[below] {RestartGame()} (playing);
-    \draw[->] (gameover) to[bend left=50] node[above] {ReturnToMenu()} (menu);
-\end{tikzpicture}
-\caption{Game state machine}
-\end{figure}
-
 \subsection{Signals}
 
 \begin{table}[h]
