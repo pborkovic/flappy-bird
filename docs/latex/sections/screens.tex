@@ -1,40 +1,4 @@
-% ============================================
-% User Interface
-% ============================================
-
 \chapter{User Interface}
-
-\section{Screen States}
-
-The UI manages three distinct visual states controlled by \texttt{UIController}.
-
-\begin{table}[h]
-\centering
-\begin{tabular}{|l|c|c|c|}
-\hline
-\textbf{Element} & \textbf{Menu} & \textbf{Playing} & \textbf{GameOver} \\
-\hline
-StartButton & Visible & Hidden & Hidden \\
-ScoreLabel & Hidden & Visible & Hidden \\
-GameOverContainer & Hidden & Hidden & Visible \\
-\hline
-\end{tabular}
-\caption{UI element visibility per state}
-\end{table}
-
-\section{UI Hierarchy}
-
-\begin{lstlisting}
-UI (CanvasLayer)
-+-- StartButton (Button)
-+-- ScoreLabel (Label)
-+-- GameOverContainer (Control)
-    +-- Panel (ColorRect)
-    +-- GameOverLabel (Label)
-    +-- FinalScoreLabel (Label)
-    +-- HighScoreLabel (Label)
-    +-- RestartButton (Button)
-\end{lstlisting}
 
 \section{UIController}
 
